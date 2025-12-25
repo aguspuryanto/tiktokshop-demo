@@ -39,39 +39,39 @@ $hasOrders = false;
 // foreach ($allOrders as $status => $orders) {
 //     if (empty($orders)) continue;
 
-    // First, collect all orders in a flat array
-    $allOrdersFlat = [];
-    foreach ($allOrders as $status => $orders) {
-        if (empty($orders)) continue;
-        foreach ($orders as $order) {
-            $allOrdersFlat[] = $order;
-        }
+// First, collect all orders in a flat array
+$allOrdersFlat = [];
+foreach ($allOrders as $status => $orders) {
+    if (empty($orders)) continue;
+    foreach ($orders as $order) {
+        $allOrdersFlat[] = $order;
     }
-    // Sort the orders by create_time in descending order
-    usort($allOrdersFlat, function($a, $b) {
-        $timeA = $a['create_time'] ?? 0;
-        $timeB = $b['create_time'] ?? 0;
-        return $timeB - $timeA; // For descending order
-    });
-    // Now display the sorted orders
-    foreach ($allOrdersFlat as $order) {
-        $hasOrders = true;
-        $orderId = $order['id'] ?? 'N/A';
-        $status = $order['status'] ?? 'N/A';
-        $createTime = isset($order['create_time']) ? date('Y-m-d H:i:s', $order['create_time']) : 'N/A';
-        
-        echo '<tr>';
-        echo '<td>' . htmlspecialchars($orderId) . '</td>';
-        echo '<td><span class="badge ' . getStatusBadgeClass($status) . '">' . 
-             ucwords(strtolower(str_replace('_', ' ', $status))) . '</span></td>';
-        echo '<td>' . $createTime . '</td>';
-        echo '<td>TRUE</td>'; // Assuming synced is always true
-        echo '<td>
-                <button class="btn btn-sm btn-primary me-1" onclick="viewOrder(\'' . $orderId . '\')">View</button>
-                <button class="btn btn-sm btn-success" onclick="syncOrder(\'' . $orderId . '\')">Sync to OBS</button>
-              </td>';
-        echo '</tr>';
-    }
+}
+// Sort the orders by create_time in descending order
+usort($allOrdersFlat, function($a, $b) {
+    $timeA = $a['create_time'] ?? 0;
+    $timeB = $b['create_time'] ?? 0;
+    return $timeB - $timeA; // For descending order
+});
+// Now display the sorted orders
+foreach ($allOrdersFlat as $order) {
+    $hasOrders = true;
+    $orderId = $order['id'] ?? 'N/A';
+    $status = $order['status'] ?? 'N/A';
+    $createTime = isset($order['create_time']) ? date('Y-m-d H:i:s', $order['create_time']) : 'N/A';
+    
+    echo '<tr>';
+    echo '<td>' . htmlspecialchars($orderId) . '</td>';
+    echo '<td><span class="badge ' . getStatusBadgeClass($status) . '">' . 
+            ucwords(strtolower(str_replace('_', ' ', $status))) . '</span></td>';
+    echo '<td>' . $createTime . '</td>';
+    echo '<td>TRUE</td>'; // Assuming synced is always true
+    echo '<td>
+            <a href="_detail.php?id=' . $orderId . '" class="btn btn-sm btn-primary me-1">View</a>
+            <button class="btn btn-sm btn-success" onclick="syncOrder(\'' . $orderId . '\')">Sync to OBS</button>
+            </td>';
+    echo '</tr>';
+}
 // }
 
 if (!$hasOrders) {
@@ -83,11 +83,12 @@ echo '</table>';
 echo '</div>'; // End of table-responsive
 
 // Add some JavaScript for the buttons
-echo '
+?>
 <script>
 function viewOrder(orderId) {
     alert("Viewing order: " + orderId);
     // Implement view order functionality
+    window.location.href = '_detail.php?id=' + encodeURIComponent(orderId);
 }
 
 function syncOrder(orderId) {
@@ -106,8 +107,9 @@ function filterOrders(status) {
     }
     window.location.href = url.toString();
 }
-</script>';
+</script>
 
+<?php
 // Helper function to get badge class based on status
 function getStatusBadgeClass($status) {
     $status = strtoupper($status);
